@@ -1,0 +1,28 @@
+--cpu Cortex-M3
+"sumaguan\startup_stm32f103xb.o"
+"sumaguan\main.o"
+"sumaguan\gpio.o"
+"sumaguan\dma.o"
+"sumaguan\tim.o"
+"sumaguan\stm32f1xx_it.o"
+"sumaguan\stm32f1xx_hal_msp.o"
+"sumaguan\stm32f1xx_hal_gpio_ex.o"
+"sumaguan\stm32f1xx_hal_tim.o"
+"sumaguan\stm32f1xx_hal_tim_ex.o"
+"sumaguan\stm32f1xx_hal.o"
+"sumaguan\stm32f1xx_hal_rcc.o"
+"sumaguan\stm32f1xx_hal_rcc_ex.o"
+"sumaguan\stm32f1xx_hal_gpio.o"
+"sumaguan\stm32f1xx_hal_dma.o"
+"sumaguan\stm32f1xx_hal_cortex.o"
+"sumaguan\stm32f1xx_hal_pwr.o"
+"sumaguan\stm32f1xx_hal_flash.o"
+"sumaguan\stm32f1xx_hal_flash_ex.o"
+"sumaguan\system_stm32f1xx.o"
+"sumaguan\cylib.o"
+"sumaguan\cylib_step_motor.o"
+"sumaguan\ppm.o"
+--library_type=microlib --strict --scatter "SuMaGuan\SuMaGuan.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "SuMaGuan.map" -o SuMaGuan\SuMaGuan.axf
