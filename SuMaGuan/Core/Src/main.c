@@ -157,10 +157,16 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM1_Init();
   MX_TIM4_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  
+  
+  HAL_Delay(30*1000);
 
 	
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+	
+	HAL_TIM_Base_Start_IT(&htim2);
 
 	cylib_init();
 	
@@ -231,6 +237,21 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
+
+
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	
+	
+	if(htim->Instance == TIM2){
+		ppm_interrupt();
+	}
+
+}
+
 
 /* USER CODE END 4 */
 
