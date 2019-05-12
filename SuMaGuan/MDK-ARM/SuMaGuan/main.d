@@ -25,10 +25,15 @@ sumaguan\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 sumaguan\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 sumaguan\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 sumaguan\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
+sumaguan\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 sumaguan\main.o: ../Core/Inc/dma.h
 sumaguan\main.o: ../Core/Inc/tim.h
+sumaguan\main.o: ../Core/Inc/usart.h
 sumaguan\main.o: ../Core/Inc/gpio.h
 sumaguan\main.o: ../Core/Src/../../cylib/cylib.h
 sumaguan\main.o: ../Core/Src/../../cylib/motor/cylib_step_motor.h
 sumaguan\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 sumaguan\main.o: ../Core/Src/../../cylib/ppm/ppm.h
+sumaguan\main.o: ../Core/Src/../../cylib/buffer/cylib_ringbuffer.h
+sumaguan\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h
+sumaguan\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

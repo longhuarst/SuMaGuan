@@ -26,6 +26,7 @@ sumaguan\cylib_step_motor.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_f
 sumaguan\cylib_step_motor.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 sumaguan\cylib_step_motor.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 sumaguan\cylib_step_motor.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
+sumaguan\cylib_step_motor.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 sumaguan\cylib_step_motor.o: ..\cylib\motor\cylib_step_motor.h
 sumaguan\cylib_step_motor.o: ../Core/Inc/gpio.h
 sumaguan\cylib_step_motor.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h

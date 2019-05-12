@@ -4,11 +4,13 @@
 "sumaguan\gpio.o"
 "sumaguan\dma.o"
 "sumaguan\tim.o"
+"sumaguan\usart.o"
 "sumaguan\stm32f1xx_it.o"
 "sumaguan\stm32f1xx_hal_msp.o"
 "sumaguan\stm32f1xx_hal_gpio_ex.o"
 "sumaguan\stm32f1xx_hal_tim.o"
 "sumaguan\stm32f1xx_hal_tim_ex.o"
+"sumaguan\stm32f1xx_hal_uart.o"
 "sumaguan\stm32f1xx_hal.o"
 "sumaguan\stm32f1xx_hal_rcc.o"
 "sumaguan\stm32f1xx_hal_rcc_ex.o"
@@ -22,6 +24,7 @@
 "sumaguan\cylib.o"
 "sumaguan\cylib_step_motor.o"
 "sumaguan\ppm.o"
+"sumaguan\cylib_ringbuffer.o"
 --library_type=microlib --strict --scatter "SuMaGuan\SuMaGuan.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

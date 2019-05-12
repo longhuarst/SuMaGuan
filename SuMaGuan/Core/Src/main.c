@@ -22,12 +22,15 @@
 #include "main.h"
 #include "dma.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 #include "../../cylib/cylib.h"
+#include "../../cylib/buffer/cylib_ringbuffer.h"
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -60,6 +63,14 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+
+uint8_t uart1_rx_data = 0;
+bool flag_1hz = false;
+char upload_buffer[256];
+ring_buffer_t uart1_rx_rb;
+
+
 void delay(uint32_t t)
 {
 	uint8_t i = 7;
@@ -85,6 +96,15 @@ bool forward_flag = true;
 	//正转
 	
 	
+	 sprintf(upload_buffer,"\r\npub/085e2d2c-77ed-416e-b852-5f83b0392fd6/VER=1.0&TYPE=sumaguan&PAYLOAD=s/%s$\r\n","oning");
+	  
+		HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_SET);
+			HAL_UART_Transmit_IT(&huart1,
+			(uint8_t *)upload_buffer,
+		  strlen(upload_buffer));
+	
+	
+	
 	TIM3->CNT =0 ;
 	
 	cylib_step_motor_io_write(cylib_step_motor.instance[0].pin.dir,GPIO_PIN_RESET);
@@ -108,6 +128,13 @@ bool forward_flag = true;
 	
 	
 		//反转
+	
+	 sprintf(upload_buffer,"\r\npub/085e2d2c-77ed-416e-b852-5f83b0392fd6/VER=1.0&TYPE=sumaguan&PAYLOAD=s/%s$\r\n","offing");
+	  
+		HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_SET);
+			HAL_UART_Transmit_IT(&huart1,
+			(uint8_t *)upload_buffer,
+		  strlen(upload_buffer));
 	
 	
 	TIM3->CNT =0 ;
@@ -158,15 +185,34 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM4_Init();
   MX_TIM2_Init();
+  MX_USART1_UART_Init();
+  
+  ring_buffer_init(&uart1_rx_rb);
   /* USER CODE BEGIN 2 */
   
   
-  HAL_Delay(30*1000);
+  //HAL_Delay(30*1000);
 
 	
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
 	
 	HAL_TIM_Base_Start_IT(&htim2);
+	HAL_TIM_Base_Start_IT(&htim4);
+	
+	HAL_UART_Receive_DMA(&huart1,&uart1_rx_data,1);
+	HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_RESET);
+
+  
+		HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_SET);
+	sprintf(upload_buffer,"\r\nsub/085e2d2c-77ed-416e-b852-5f83b0392fd6-device\r\n");
+			HAL_UART_Transmit_IT(&huart1,
+			(uint8_t *)upload_buffer,
+		  strlen(upload_buffer));
+	
+	//while(1);
+
+
+	HAL_Delay(1000);
 
 	cylib_init();
 	
@@ -185,9 +231,68 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  
-	  ppm_polling();
+	  //ppm_polling();
 	  
 	  
+	  if (flag_1hz == true){
+		flag_1hz = false;
+		 
+		  
+		  if (forward_flag== true){
+			sprintf(upload_buffer,"\r\npub/085e2d2c-77ed-416e-b852-5f83b0392fd6/VER=1.0&TYPE=sumaguan&PAYLOAD=s/%s$\r\n","off");
+		  }else{
+			sprintf(upload_buffer,"\r\npub/085e2d2c-77ed-416e-b852-5f83b0392fd6/VER=1.0&TYPE=sumaguan&PAYLOAD=s/%s$\r\n","on");
+		  }
+		  
+		HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_SET);
+			HAL_UART_Transmit_IT(&huart1,
+			(uint8_t *)upload_buffer,
+		  strlen(upload_buffer));
+		  
+		  
+		  
+		  
+	  }
+	  
+	  
+	  
+	  
+	  //解析串口数据
+	  {
+		static char buffer[128];
+		 static uint8_t pos = 0;
+		
+		  pos += ring_buffer_dequeue(&uart1_rx_rb,&buffer[pos]);
+		  
+		  if (pos >= 1){
+			if (buffer[pos-1] == '\n'){
+				
+				
+				buffer[pos] = 0;
+				
+				
+				if (strcmp(buffer,"VER=1.0&TYPE=sumaguan&PAYLOAD=c/on$\r\n") ==0){
+					ppm1_callback();
+				}else if (strcmp(buffer,"VER=1.0&TYPE=sumaguan&PAYLOAD=c/off$\r\n") ==0){
+					ppm2_callback();
+				}
+				
+				
+				
+				pos = 0;
+			
+			}
+		  }
+		  
+		  
+		  if (pos >= 128){
+			pos = 0;
+		  }
+		  
+		  
+		  
+		  
+	  }
 	  
 	  
 	  
@@ -248,11 +353,40 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	
 	if(htim->Instance == TIM2){
 		ppm_interrupt();
+	}else if(htim->Instance == TIM4){
+		static uint32_t counter = 0;
+		
+		counter++;
+		counter%=1000;
+		
+		if (counter == 0){
+			flag_1hz = true;
+		}
+		
+		
+		
 	}
 
 }
 
 
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
+	if (huart->Instance == USART1){
+		HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_RESET);
+	}
+}
+
+
+
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+
+	if (huart->Instance == USART1){
+		ring_buffer_queue(&uart1_rx_rb,uart1_rx_data);
+	}
+}
 /* USER CODE END 4 */
 
 /**
