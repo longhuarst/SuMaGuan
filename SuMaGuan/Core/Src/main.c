@@ -70,6 +70,8 @@ bool flag_1hz = false;
 char upload_buffer[256];
 ring_buffer_t uart1_rx_rb;
 
+uint32_t timeout_counter = 0;
+
 
 void delay(uint32_t t)
 {
@@ -115,6 +117,20 @@ bool forward_flag = true;
 		delay(10);
 	}
 	
+	//HAL_Delay(10);
+	
+	while(huart1.gState != HAL_UART_STATE_READY);
+	
+	
+	 sprintf(upload_buffer,"\r\npub/085e2d2c-77ed-416e-b852-5f83b0392fd6/VER=1.0&TYPE=sumaguan&PAYLOAD=s/%s$\r\n","on");
+	  
+		HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_SET);
+			HAL_UART_Transmit_IT(&huart1,
+			(uint8_t *)upload_buffer,
+		  strlen(upload_buffer));
+	
+	TIM4->CNT = 0;
+	flag_1hz = false;
 	
 }
 
@@ -147,6 +163,19 @@ bool forward_flag = true;
 		delay(10);
 	}
 	
+	
+	//HAL_Delay(10);
+	
+	while(huart1.gState != HAL_UART_STATE_READY);
+	sprintf(upload_buffer,"\r\npub/085e2d2c-77ed-416e-b852-5f83b0392fd6/VER=1.0&TYPE=sumaguan&PAYLOAD=s/%s$\r\n","off");
+	  
+		HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_SET);
+			HAL_UART_Transmit_IT(&huart1,
+			(uint8_t *)upload_buffer,
+		  strlen(upload_buffer));
+	
+	TIM4->CNT = 0;
+	flag_1hz = false;
  }
 	
 
@@ -294,7 +323,15 @@ int main(void)
 		  
 	  }
 	  
-	  
+	  if (timeout_counter >= 5){
+		timeout_counter = 0;
+		  
+		  HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_SET);
+			sprintf(upload_buffer,"\r\nsub/085e2d2c-77ed-416e-b852-5f83b0392fd6-device\r\n");
+			HAL_UART_Transmit_IT(&huart1,
+			(uint8_t *)upload_buffer,
+		  strlen(upload_buffer));
+	  }
 	  
 	  
 	  
@@ -345,8 +382,6 @@ void SystemClock_Config(void)
 
 
 
-
-
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	
@@ -359,7 +394,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		counter++;
 		counter%=1000;
 		
+		
+		
 		if (counter == 0){
+			timeout_counter++;
 			flag_1hz = true;
 		}
 		
