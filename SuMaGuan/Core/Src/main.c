@@ -98,6 +98,9 @@ bool forward_flag = true;
 	//正转
 	
 	
+	#if USE_4G == 1
+	
+	
 	 sprintf(upload_buffer,"\r\npub/085e2d2c-77ed-416e-b852-5f83b0392fd6/VER=1.0&TYPE=sumaguan&PAYLOAD=s/%s$\r\n","oning");
 	  
 		HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_SET);
@@ -105,6 +108,8 @@ bool forward_flag = true;
 			(uint8_t *)upload_buffer,
 		  strlen(upload_buffer));
 	
+	
+	#endif
 	
 	
 	TIM3->CNT =0 ;
@@ -119,6 +124,9 @@ bool forward_flag = true;
 	
 	//HAL_Delay(10);
 	
+	
+	
+	#if USE_4G == 1
 	while(huart1.gState != HAL_UART_STATE_READY);
 	
 	
@@ -131,6 +139,9 @@ bool forward_flag = true;
 	
 	TIM4->CNT = 0;
 	flag_1hz = false;
+	
+	#endif
+	
 	
 }
 
@@ -145,12 +156,17 @@ bool forward_flag = true;
 	
 		//反转
 	
+	
+	#if USE_4G == 1
+	
 	 sprintf(upload_buffer,"\r\npub/085e2d2c-77ed-416e-b852-5f83b0392fd6/VER=1.0&TYPE=sumaguan&PAYLOAD=s/%s$\r\n","offing");
 	  
 		HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_SET);
 			HAL_UART_Transmit_IT(&huart1,
 			(uint8_t *)upload_buffer,
 		  strlen(upload_buffer));
+	
+	#endif
 	
 	
 	TIM3->CNT =0 ;
@@ -166,6 +182,9 @@ bool forward_flag = true;
 	
 	//HAL_Delay(10);
 	
+	
+	#if USE_4G == 1
+	
 	while(huart1.gState != HAL_UART_STATE_READY);
 	sprintf(upload_buffer,"\r\npub/085e2d2c-77ed-416e-b852-5f83b0392fd6/VER=1.0&TYPE=sumaguan&PAYLOAD=s/%s$\r\n","off");
 	  
@@ -176,6 +195,9 @@ bool forward_flag = true;
 	
 	TIM4->CNT = 0;
 	flag_1hz = false;
+	
+	#endif
+	
  }
 	
 
@@ -215,12 +237,10 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM2_Init();
   MX_USART1_UART_Init();
-  
-  ring_buffer_init(&uart1_rx_rb);
   /* USER CODE BEGIN 2 */
   
   
-  //HAL_Delay(30*1000);
+  HAL_Delay(30*1000);
 
 	
 	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
@@ -231,12 +251,19 @@ int main(void)
 	HAL_UART_Receive_DMA(&huart1,&uart1_rx_data,1);
 	HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_RESET);
 
+
+
+#if USE_4G == 1
   
 		HAL_GPIO_WritePin(RE485_DE_GPIO_Port,RE485_DE_Pin,GPIO_PIN_SET);
 	sprintf(upload_buffer,"\r\nsub/085e2d2c-77ed-416e-b852-5f83b0392fd6-device\r\n");
 			HAL_UART_Transmit_IT(&huart1,
 			(uint8_t *)upload_buffer,
 		  strlen(upload_buffer));
+		  
+		  
+#endif
+		  
 	
 	//while(1);
 
@@ -260,7 +287,10 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  
-	  //ppm_polling();
+	  #if USE_4G == 0
+	  ppm_polling();
+	  
+	  #else
 	  
 	  
 	  if (flag_1hz == true){
@@ -332,6 +362,9 @@ int main(void)
 			(uint8_t *)upload_buffer,
 		  strlen(upload_buffer));
 	  }
+	  
+	  
+	  #endif
 	  
 	  
 	  
